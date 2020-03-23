@@ -100,7 +100,7 @@
 	     ) (progn
 		 (format t "Kone vapaana!~%")
 		 (mixalot:mixer-add-streamer *mixer*
-					     (mixalot-mp3:make-mp3-streamer (merge-pathnames (user-homedir-pathname) #P"tervehdys.mp3")));;get tervehdys.mp3 from homedirectory
+					     (mixalot-mp3:make-mp3-streamer (namestring (merge-pathnames (user-homedir-pathname) #P"tervehdys.mp3"))));;get tervehdys.mp3 from homedirectory
 		 (sleep 5) ;;Sleep command is here so that sound message will be played. Before message was not played. I assume it was because function ended before message got played.
 					     )
 	   (format t "Kone käynnissä~%")

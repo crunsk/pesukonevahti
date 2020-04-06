@@ -14,8 +14,8 @@
 		   (acons "__VIEWSTATE"  vs
 			  (acons "__VIEWSTATEGENERATOR"  vsg 
 				 (acons "__EVENTVALIDATION"  ev
-					( acons "ctl00$ContentPlaceHolder1$tbPassword"  (nth 2 sb-ext:*posix-argv*)
-						(acons "ctl00$ContentPlaceHolder1$tbUsername" (nth 1 sb-ext:*posix-argv*)
+					( acons "ctl00$ContentPlaceHolder1$tbPassword"  *password*
+						(acons "ctl00$ContentPlaceHolder1$tbUsername" *username*
 						       (acons "ctl00$MessageType"  "ERROR" '())))))))
 		            
 			  :cookie-jar *cookie-jar*))
@@ -27,8 +27,8 @@
 		       (acons "__VIEWSTATE"  vs
 		       (acons "__VIEWSTATEGENERATOR"  vsg 
 			      (acons "__EVENTVALIDATION"  ev
-				     (acons "ctl00$ContentPlaceHolder1$tbPassword"  (nth 2 sb-ext:*posix-argv*)
-						(acons "ctl00$ContentPlaceHolder1$tbUsername" (nth 1 sb-ext:*posix-argv*)
+				     (acons "ctl00$ContentPlaceHolder1$tbPassword"  *password*
+						(acons "ctl00$ContentPlaceHolder1$tbUsername" *username*
 		       '(	       
 		       ("ctl00$ContentPlaceHolder1$Repeater1$ctl01$imgPos" . "0%+0%")
 			 ("ctl00$MessageType" . "ERROR")))))))) :cookie-jar *cookie-jar*))
@@ -40,8 +40,8 @@
 		   (acons "__VIEWSTATE"  vs
 			  (acons "__VIEWSTATEGENERATOR"  vsg 
 				 (acons "__EVENTVALIDATION"  ev
-					(acons "ctl00$ContentPlaceHolder1$tbPassword"  (nth 2 sb-ext:*posix-argv*)
-					       (acons "ctl00$ContentPlaceHolder1$tbUsername" (nth 1 sb-ext:*posix-argv*)
+					(acons "ctl00$ContentPlaceHolder1$tbPassword"  *password*
+					       (acons "ctl00$ContentPlaceHolder1$tbUsername" *username*
 		       '(("ctl00$ContentPlaceHolder1$Repeater1$ctl01$imgPos" . "0%+0%")
 			 ("ctl00$MessageType" . "ERROR")))))))) :cookie-jar *cookie-jar*))
 
@@ -52,7 +52,7 @@
 		       (acons "__VIEWSTATE"  vs
 		       (acons "__VIEWSTATEGENERATOR"  vsg 
 			      (acons "__EVENTVALIDATION"  ev
-				     (acons "ctl00$ContentPlaceHolder1$tbPassword"  (nth 2 sb-ext:*posix-argv*) (acons "ctl00$ContentPlaceHolder1$tbUsername"  (nth 1 sb-ext:*posix-argv*) 
+				     (acons "ctl00$ContentPlaceHolder1$tbPassword"  *password* (acons "ctl00$ContentPlaceHolder1$tbUsername"  *username* 
 		       '(      
 		       ("ctl00$ContentPlaceHolder1$Repeater1$ctl01$imgPos" . "0%+0%")
 			 ("ctl00$MessageType" . "ERROR")))))))) :cookie-jar *cookie-jar*))
@@ -91,11 +91,13 @@
 
     (if has-credentials
 	(progn
+	  (MIXALOT:MAIN-THREAD-INIT) ;; have to call this onn windows in order to not have error "	  (MIXALOT:MAIN-THREAD-INIT) ;; have to call this in windows in order...". This has to be called before creating a mixer. I struggled for a bit before realizing this. Even tried using trivial-main-thread as well.
 	  (setf *mixer* (mixalot:create-mixer))
+
 	  ;;pyydetään aloitussivu
 	  (setf *request*
 		(dex:post "https://ilmarinen.vuorosi.fi/Default.aspx"
-			  :content (acons "ctl00$ContentPlaceHolder1$tbPassword" (nth 2 sb-ext:*posix-argv*) (acons "ctl00$ContentPlaceHolder1$tbUsername" (nth 1 sb-ext:*posix-argv*) '())) :cookie-jar *cookie-jar*))
+			  :content (acons "ctl00$ContentPlaceHolder1$tbPassword" *password* (acons "ctl00$ContentPlaceHolder1$tbUsername" *username* '())) :cookie-jar *cookie-jar*))
 	  ;;parsetaan sisältö
 	  (setf *parsed-content* (lquery:$ (initialize *request*)))
 	  
@@ -128,7 +130,7 @@
 	  (let ((aika (multiple-value-list (decode-universal-time (get-universal-time) -2))))
 	    (format t "~a:~a ~a.~a.~a~%" 
 		    (nth 2 aika) (nth 1 aika) (nth 3 aika) (nth 4 aika) (nth 5 aika)))
-;;;    (format t "usr: ~a pass: ~a" (nth 1 sb-ext:*posix-argv*) (nth 2 sb-ext:*posix-argv*))
+;;;    (format t "usr: ~a pass: ~a" *username* *password*)
 	  (if (not (search "käynn" (string-downcase (aref (lquery:$ *parsed-content-varaa* "#ctl00_ContentPlaceHolder1_Repeater1_ctl00_Repeater2_ctl00_MaskGrpTitle" (text)) 0)))
 		   ) (progn
 		       (format t "Kone vapaana!~%")
